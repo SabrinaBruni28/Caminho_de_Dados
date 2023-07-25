@@ -1,0 +1,162 @@
+module Display(
+		input clock,
+		input reset,
+		input [11:0] linha,
+		input [7:0] max,
+		
+		output reg [6:0] displayDez,
+		output reg [6:0] displayUm
+);
+		
+		
+	always @(posedge clock, posedge reset)begin	
+		if(reset == 1) begin
+			displayDez = 7'b1111111;
+			displayUm = 7'b1111111;
+		end
+		else if(linha < max)begin//Atribuição da dezena
+			case(linha/ 10)
+				//Algarismos
+				0: displayDez = 7'b1000000;
+				1: displayDez = 7'b1111001;
+				2: displayDez = 7'b0100100;
+				3: displayDez = 7'b0110000;
+				4: displayDez = 7'b0011001;
+				5: displayDez = 7'b0010010;
+				6: displayDez = 7'b0000010;
+				7: displayDez = 7'b1111000;
+				8: displayDez = 7'b0000000;
+				9: displayDez = 7'b0010000;
+			endcase
+			//Atribuição da unidade
+			case(linha % 10)
+				//Algarismos
+				0: displayUm = 7'b1000000;
+				1: displayUm = 7'b1111001;
+				2: displayUm = 7'b0100100;
+				3: displayUm = 7'b0110000;
+				4: displayUm = 7'b0011001;
+				5: displayUm = 7'b0010010;
+				6: displayUm = 7'b0000010;
+				7: displayUm = 7'b1111000;
+				8: displayUm = 7'b0000000;
+				9: displayUm = 7'b0010000;
+			endcase	
+		end	
+	end
+endmodule
+
+module Display_register(
+		input r,
+		input m,
+		input reset,
+		input [31:0][11:0] Registers,
+		input [31:0][11:0] Memory,
+		
+		output reg [6:0] displayqq1,
+		output reg [6:0] displayqq2,
+		output reg [6:0] display1,
+		output reg [6:0] display2,
+		output reg [6:0] displayCem,
+		output reg [6:0] displayDez,
+		output reg [6:0] displayUm
+);
+		
+	integer i;
+	reg [31:0][11:0] valor;	
+	always @(posedge r, posedge m, posedge reset)begin	
+		if(reset == 1) begin
+			display1 = 7'b1111111;
+			display2 = 7'b1111111;
+			displayCem = 7'b1111111;
+			displayDez = 7'b1111111;
+			displayUm = 7'b1111111;
+		end
+		else begin
+			if(i<31) i<=i+1;
+			else i <= 0;
+			
+			if(r==1) begin
+				valor <= Registers;
+				displayqq1 = 7'b0000110;
+				displayqq2 = 7'b0110110;
+			end
+			else if(m==1) begin
+				valor <= Memory;
+				displayqq1 = 7'b1000111;
+				displayqq2 = 7'b1001001;
+			end
+		//registro
+			case(i/ 10)
+				//Algarismos
+				0: display1 = 7'b1000000;
+				1: display1 = 7'b1111001;
+				2: display1 = 7'b0100100;
+				3: display1 = 7'b0110000;
+				4: display1 = 7'b0011001;
+				5: display1 = 7'b0010010;
+				6: display1 = 7'b0000010;
+				7: display1 = 7'b1111000;
+				8: display1 = 7'b0000000;
+				9: display1 = 7'b0010000;
+			endcase
+			//Atribuição da unidade
+			case(i % 10)
+				//Algarismos
+				0: display2 = 7'b1000000;
+				1: display2 = 7'b1111001;
+				2: display2 = 7'b0100100;
+				3: display2 = 7'b0110000;
+				4: display2 = 7'b0011001;
+				5: display2 = 7'b0010010;
+				6: display2 = 7'b0000010;
+				7: display2 = 7'b1111000;
+				8: display2 = 7'b0000000;
+				9: display2 = 7'b0010000;
+			endcase
+		//valor armazenado
+			//Atribuição da centena
+			case(valor[i]/ 100)
+				//Algarismos
+				0: displayCem = 7'b1000000;
+				1: displayCem = 7'b1111001;
+				2: displayCem = 7'b0100100;
+				3: displayCem = 7'b0110000;
+				4: displayCem = 7'b0011001;
+				5: displayCem = 7'b0010010;
+				6: displayCem = 7'b0000010;
+				7: displayCem = 7'b1111000;
+				8: displayCem = 7'b0000000;
+				9: displayCem = 7'b0010000;
+			endcase
+			//Atribuição da dezena
+			case(valor[i] % 100 / 10)
+				//Algarismos
+				0: displayDez = 7'b1000000;
+				1: displayDez = 7'b1111001;
+				2: displayDez = 7'b0100100;
+				3: displayDez = 7'b0110000;
+				4: displayDez = 7'b0011001;
+				5: displayDez = 7'b0010010;
+				6: displayDez = 7'b0000010;
+				7: displayDez = 7'b1111000;
+				8: displayDez = 7'b0000000;
+				9: displayDez = 7'b0010000;
+			endcase
+			//Atribuição da unidade
+			case(valor[i] % 100 % 10)
+				//Algarismos
+				0: displayUm = 7'b1000000;
+				1: displayUm = 7'b1111001;
+				2: displayUm = 7'b0100100;
+				3: displayUm = 7'b0110000;
+				4: displayUm = 7'b0011001;
+				5: displayUm = 7'b0010010;
+				6: displayUm = 7'b0000010;
+				7: displayUm = 7'b1111000;
+				8: displayUm = 7'b0000000;
+				9: displayUm = 7'b0010000;
+			endcase	
+		end	
+	end
+endmodule
